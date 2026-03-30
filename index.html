@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SlotMedical — Marketplace de Consultórios em São Paulo</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,600&family=Instrument+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+/* ─── TOKENS ─── */
+:root {
+  --ink:      #141412;
+  --paper:    #F7F3EC;
+  --linen:    #EDE7DA;
+  --gold:     #B8965A;
+  --gold-lt:  #D4B483;
+  --slate:    #4A5568;
+  --moss:     #5C6B52;
+  --smoke:    #9DA8A0;
+  --white:    #FDFCF9;
+  --rule:     rgba(90,85,76,.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Instrument Sans',sans-serif;
+  background:var(--paper);color:var(--ink);
+  overflow-x:hidden;cursor:none;
+}
+
+/* ─── CURSOR ─── */
+.cursor{
+  position:fixed;width:10px;height:10px;background:var(--gold);border-radius:50%;
+  pointer-events:none;z-index:9999;transform:translate(-50%,-50%);
+  transition:transform .1s,width .25s,height .25s,background .25s;
+}
+.cursor-ring{
+  position:fixed;width:36px;height:36px;
+  border:1px solid rgba(184,150,90,.45);border-radius:50%;
+  pointer-events:none;z-index:9998;transform:translate(-50%,-50%);
+  transition:transform .18s ease,width .3s,height .3s,opacity .3s;
+}
+
+/* ─── NAV ─── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:32px 72px;
+  transition:background .4s,padding .35s,border-color .4s;
+  border-bottom:1px solid transparent;
+}
+nav.scrolled{
+  background:rgba(247,243,236,.96);backdrop-filter:blur(16px);
+  padding:20px 72px;border-bottom:1px solid var(--rule);
+}
+.logo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:22px;font-weight:500;letter-spacing:.08em;
+  color:var(--white);text-decoration:none;
+  display:flex;flex-direction:column;line-height:1.1;transition:color .3s;
+}
+.logo span{font-size:9px;letter-spacing:.28em;text-transform:uppercase;font-family:'Instrument Sans',sans-serif;font-weight:300;opacity:.65}
+nav.scrolled .logo{color:var(--ink)}
+.nav-links{display:flex;gap:40px;list-style:none;align-items:center}
+.nav-links a{
+  font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:rgba(255,255,255,.7);text-decoration:none;transition:color .3s;font-weight:400;
+}
+nav.scrolled .nav-links a{color:var(--slate)}
+.nav-links a:hover{color:var(--gold)}
+.nav-actions{display:flex;gap:10px;align-items:center}
+.nav-btn-outline{
+  font-family:'Instrument Sans',sans-serif;
+  font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:rgba(255,255,255,.8);background:transparent;
+  border:1px solid rgba(255,255,255,.35);padding:12px 28px;cursor:none;
+  transition:all .3s;
+}
+nav.scrolled .nav-btn-outline{color:var(--slate);border-color:rgba(90,85,76,.3)}
+.nav-btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+.nav-btn{
+  font-family:'Instrument Sans',sans-serif;
+  font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink);background:var(--gold);
+  border:none;padding:13px 28px;cursor:none;transition:all .3s;
+}
+.nav-btn:hover{background:var(--ink);color:var(--white);transform:translateY(-1px)}
+
+/* ─── HERO ─── */
+.hero{
+  height:100vh;min-height:720px;position:relative;overflow:hidden;
+  display:grid;grid-template-columns:1fr 1fr;align-items:end;
+}
+.hero-visual{
+  position:absolute;inset:0;
+  background:
+    linear-gradient(135deg,rgba(20,20,18,.78) 0%,rgba(20,20,18,.32) 55%,rgba(20,20,18,.68) 100%),
+    url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1800&q=85') center/cover no-repeat;
+}
+.hero-grid-overlay{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(184,150,90,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(184,150,90,.04) 1px,transparent 1px);
+  background-size:80px 80px;pointer-events:none;
+}
+.hero-left{
+  position:relative;padding:0 72px 100px;
+  display:flex;flex-direction:column;justify-content:flex-end;height:100%;
+}
+.hero-eyebrow{
+  font-size:9px;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--gold);border-left:2px solid var(--gold);padding-left:14px;
+  margin-bottom:32px;opacity:0;animation:slideUp .7s .4s forwards;
+}
+.hero h1{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(52px,6.5vw,90px);font-weight:300;line-height:.95;
+  color:var(--white);letter-spacing:-.02em;
+  opacity:0;animation:slideUp .9s .6s forwards;
+}
+.hero h1 em{display:block;font-style:italic;color:var(--gold-lt)}
+.hero h1 strong{font-weight:300;display:block}
+.hero-sub{
+  margin-top:36px;max-width:420px;
+  font-size:14px;line-height:1.85;color:rgba(255,255,255,.58);font-weight:300;
+  opacity:0;animation:slideUp .7s .9s forwards;
+}
+
+/* DUAL CTA */
+.hero-actions{
+  margin-top:48px;display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:560px;
+  opacity:0;animation:slideUp .7s 1.1s forwards;
+}
+.cta-block{
+  padding:24px 28px;border:1px solid rgba(255,255,255,.15);
+  cursor:none;transition:all .35s;position:relative;overflow:hidden;
+}
+.cta-block::after{
+  content:'';position:absolute;inset:0;
+  background:rgba(255,255,255,0);transition:background .3s;
+}
+.cta-block-gold{background:var(--gold);border-color:var(--gold)}
+.cta-block-gold:hover{background:var(--gold-lt);transform:translateY(-3px)}
+.cta-block-outline:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.5);transform:translateY(-3px)}
+.cta-block-eyebrow{
+  font-size:8px;letter-spacing:.22em;text-transform:uppercase;
+  margin-bottom:10px;font-weight:400;
+}
+.cta-block-gold .cta-block-eyebrow{color:rgba(20,20,18,.6)}
+.cta-block-outline .cta-block-eyebrow{color:rgba(255,255,255,.5)}
+.cta-block-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:22px;font-weight:400;line-height:1.2;margin-bottom:16px;
+}
+.cta-block-gold .cta-block-title{color:var(--ink)}
+.cta-block-outline .cta-block-title{color:var(--white)}
+.cta-block-action{
+  font-size:9px;letter-spacing:.18em;text-transform:uppercase;font-weight:400;
+  display:flex;align-items:center;gap:8px;
+}
+.cta-block-gold .cta-block-action{color:rgba(20,20,18,.7)}
+.cta-block-outline .cta-block-action{color:rgba(255,255,255,.55)}
+.cta-arrow{transition:transform .3s}
+.cta-block:hover .cta-arrow{transform:translateX(5px)}
+
+.hero-right{
+  position:relative;height:100%;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:0 72px 100px 0;
+  opacity:0;animation:fadeIn .8s 1.3s forwards;
+}
+.hero-stat-stack{display:flex;flex-direction:column;gap:0;align-items:flex-end}
+.h-stat{
+  display:flex;flex-direction:column;align-items:flex-end;
+  padding:24px 0;border-bottom:1px solid rgba(255,255,255,.1);width:220px;
+}
+.h-stat:first-child{border-top:1px solid rgba(255,255,255,.1)}
+.h-stat-num{font-family:'Cormorant Garamond',serif;font-size:56px;font-weight:300;color:var(--white);line-height:1}
+.h-stat-label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-top:4px}
+
+.hero-scroll-indicator{
+  position:absolute;bottom:40px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  font-size:8px;letter-spacing:.22em;text-transform:uppercase;
+  color:rgba(255,255,255,.3);animation:fadeIn 1s 2s forwards;opacity:0;
+}
+.scroll-line{width:1px;height:52px;background:linear-gradient(to bottom,rgba(255,255,255,.3),transparent);animation:pulse-line 2s 2.2s infinite}
+
+/* ─── TICKER ─── */
+.ticker-band{background:var(--ink);padding:16px 0;overflow:hidden}
+.ticker-inner{display:flex;width:max-content;animation:ticker 40s linear infinite}
+.t-item{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.28);padding:0 48px;white-space:nowrap}
+.t-item b{color:var(--gold);font-weight:400;margin-right:48px}
+
+/* ─── SECTIONS ─── */
+section{padding:120px 72px}
+.label{font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin-bottom:18px;display:flex;align-items:center;gap:12px}
+.label::before{content:'';display:block;width:28px;height:1px;background:var(--gold)}
+.h2{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,4.5vw,64px);font-weight:300;line-height:1.05;color:var(--ink)}
+.h2 em{font-style:italic;color:var(--moss)}
+
+/* ─── PROPOSTA / SOBRE ─── */
+.proposta{background:var(--white)}
+.proposta-grid{display:grid;grid-template-columns:1fr 1fr;gap:110px;align-items:center;margin-top:80px}
+.proposta-img-wrap{position:relative;overflow:hidden}
+.proposta-img-main{width:100%;height:580px;object-fit:cover;display:block;transition:transform .9s ease;filter:saturate(.9)}
+.proposta-img-wrap:hover .proposta-img-main{transform:scale(1.03);filter:saturate(1)}
+.proposta-img-accent{
+  position:absolute;right:-40px;bottom:-40px;
+  width:220px;height:280px;object-fit:cover;
+  border:6px solid var(--white);box-shadow:0 24px 60px rgba(20,20,18,.18);
+  transition:transform .6s ease;
+}
+.proposta-img-wrap:hover .proposta-img-accent{transform:translate(-4px,-4px)}
+.proposta-caption{
+  position:absolute;top:28px;left:28px;
+  font-size:9px;letter-spacing:.18em;text-transform:uppercase;
+  color:rgba(255,255,255,.65);background:rgba(20,20,18,.45);
+  padding:8px 14px;backdrop-filter:blur(6px);
+}
+.proposta-text .h2{margin-bottom:36px}
+.proposta-text p{font-size:14px;line-height:1.95;color:var(--slate);font-weight:300;margin-bottom:16px;max-width:480px}
+.proposta-list{list-style:none;margin-top:36px;display:flex;flex-direction:column;gap:16px}
+.proposta-list li{display:flex;gap:14px;align-items:flex-start;font-size:13px;color:var(--slate);font-weight:300;line-height:1.6}
+.proposta-list li::before{content:'✦';color:var(--gold);font-size:9px;margin-top:4px;flex-shrink:0}
+
+/* ─── BUSCA / MARKETPLACE ─── */
+.marketplace{background:var(--paper)}
+.mkt-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:56px;flex-wrap:wrap;gap:24px}
+.mkt-header-left .h2{margin-bottom:12px}
+.mkt-header-left p{font-size:14px;line-height:1.8;color:var(--slate);font-weight:300;max-width:480px}
+
+/* SEARCH BAR */
+.search-bar{
+  background:var(--white);border:1px solid var(--rule);
+  display:flex;align-items:stretch;margin-bottom:48px;
+}
+.sf{
+  flex:1;display:flex;flex-direction:column;justify-content:center;
+  padding:18px 28px;border-right:1px solid var(--rule);
+}
+.sf:last-of-type{border-right:none}
+.sf-label{font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:5px}
+.sf select,.sf input{
+  border:none;outline:none;background:transparent;
+  font-family:'Instrument Sans',sans-serif;font-size:14px;font-weight:300;
+  color:var(--ink);cursor:none;
+}
+.sf select option{color:var(--ink);background:var(--white)}
+.search-go{
+  background:var(--ink);color:var(--white);border:none;
+  padding:0 40px;font-family:'Instrument Sans',sans-serif;
+  font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  cursor:none;transition:background .3s;flex-shrink:0;
+}
+.search-go:hover{background:var(--gold);color:var(--ink)}
+
+/* TABS */
+.mkt-tabs{display:flex;gap:0;margin-bottom:40px;border-bottom:1px solid var(--rule)}
+.mkt-tab{
+  font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  padding:14px 32px;color:var(--smoke);cursor:none;
+  border-bottom:2px solid transparent;margin-bottom:-1px;
+  transition:color .25s,border-color .25s;background:none;border-top:none;border-left:none;border-right:none;
+  font-family:'Instrument Sans',sans-serif;
+}
+.mkt-tab:hover{color:var(--slate)}
+.mkt-tab.active{color:var(--ink);border-bottom-color:var(--gold)}
+
+/* LISTINGS LAYOUT */
+.mkt-body{display:grid;grid-template-columns:260px 1fr;gap:48px;align-items:start}
+
+/* SIDEBAR */
+.mkt-sidebar{position:sticky;top:100px}
+.filter-block{
+  border-top:1px solid var(--rule);padding:24px 0;
+}
+.filter-block:last-child{border-bottom:1px solid var(--rule)}
+.fb-title{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--smoke);margin-bottom:18px}
+.filter-check{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;cursor:none}
+.filter-check-left{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:300;color:var(--slate)}
+.filter-check-left input[type=checkbox]{accent-color:var(--gold);cursor:none;width:14px;height:14px}
+.filter-count{font-size:10px;color:var(--smoke)}
+.price-inputs{display:flex;gap:8px;margin-top:4px}
+.price-inp{
+  flex:1;padding:10px 12px;border:1px solid var(--rule);
+  background:var(--white);font-family:'Instrument Sans',sans-serif;
+  font-size:12px;color:var(--ink);outline:none;transition:border-color .2s;
+}
+.price-inp:focus{border-color:var(--gold)}
+.tag-cloud{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.ftag{
+  font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+  padding:6px 13px;border:1px solid var(--rule);
+  color:var(--smoke);cursor:none;transition:all .25s;
+}
+.ftag:hover,.ftag.active{border-color:var(--gold);color:var(--gold);background:rgba(184,150,90,.05)}
+.apply-filters{
+  margin-top:28px;width:100%;padding:14px;
+  font-family:'Instrument Sans',sans-serif;font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+  background:var(--ink);color:var(--white);border:none;cursor:none;transition:background .3s;
+}
+.apply-filters:hover{background:var(--gold);color:var(--ink)}
+
+/* CARDS */
+.cards-grid{display:flex;flex-direction:column;gap:2px}
+.listing-card{
+  background:var(--white);display:grid;grid-template-columns:280px 1fr auto;
+  position:relative;overflow:hidden;cursor:none;
+  transition:transform .3s,box-shadow .3s;
+}
+.listing-card:hover{transform:translateX(4px);box-shadow:-6px 0 0 0 var(--gold)}
+.listing-card-img{
+  height:220px;object-fit:cover;width:100%;display:block;
+  filter:saturate(.85);transition:filter .5s,transform .6s;
+}
+.listing-card:hover .listing-card-img{filter:saturate(1);transform:scale(1.04)}
+.listing-card-img-wrap{overflow:hidden;position:relative}
+.listing-badge{
+  position:absolute;top:16px;left:16px;
+  font-size:8px;letter-spacing:.2em;text-transform:uppercase;
+  background:var(--ink);color:var(--gold);padding:5px 12px;
+}
+.listing-card-body{padding:32px 36px;display:flex;flex-direction:column;justify-content:space-between}
+.listing-cat{font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.listing-cat::before{content:'';display:block;width:16px;height:1px;background:var(--gold)}
+.listing-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;color:var(--ink);margin-bottom:6px;line-height:1.2}
+.listing-loc{font-size:12px;color:var(--smoke);font-weight:300;margin-bottom:18px}
+.listing-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
+.ltag{font-size:8px;letter-spacing:.14em;text-transform:uppercase;border:1px solid var(--rule);padding:5px 12px;color:var(--slate)}
+.listing-feats{display:flex;flex-direction:column;gap:7px}
+.listing-feats span{font-size:12px;font-weight:300;color:var(--smoke);display:flex;align-items:center;gap:8px}
+.listing-feats span::before{content:'—';color:var(--gold);font-size:9px}
+.listing-card-price{
+  padding:32px 36px;display:flex;flex-direction:column;align-items:flex-end;
+  justify-content:space-between;border-left:1px solid var(--rule);min-width:180px;
+}
+.price-amount{font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:300;color:var(--ink);line-height:1}
+.price-period{font-size:10px;letter-spacing:.1em;color:var(--smoke);margin-top:3px}
+.price-type{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-top:8px}
+.listing-rating{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--smoke);margin-top:4px}
+.listing-rating b{color:var(--ink);font-weight:500}
+.listing-fav{
+  background:none;border:1px solid var(--rule);
+  width:36px;height:36px;display:flex;align-items:center;justify-content:center;
+  cursor:none;font-size:14px;transition:all .2s;margin-bottom:12px;
+}
+.listing-fav:hover{border-color:var(--gold);background:rgba(184,150,90,.05)}
+.btn-detail{
+  font-family:'Instrument Sans',sans-serif;
+  font-size:9px;letter-spacing:.18em;text-transform:uppercase;
+  background:var(--ink);color:var(--white);border:none;
+  padding:12px 20px;cursor:none;transition:all .25s;margin-top:auto;
+}
+.btn-detail:hover{background:var(--gold);color:var(--ink)}
+.empty-state{
+  grid-column:1/-1;text-align:center;padding:80px 20px;
+  font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--smoke);
+}
+.empty-state small{display:block;font-family:'Instrument Sans',sans-serif;font-size:12px;margin-top:10px;font-weight:300}
+
+/* ─── COMO FUNCIONA ─── */
+.como{background:var(--ink);position:relative;overflow:hidden}
+.como::after{
+  content:'SLOTMEDICAL';
+  position:absolute;right:-80px;top:50%;transform:translateY(-50%) rotate(90deg);
+  font-family:'Cormorant Garamond',serif;font-size:140px;font-weight:300;
+  color:rgba(255,255,255,.025);pointer-events:none;white-space:nowrap;letter-spacing:.06em;
+}
+.como .label{color:rgba(184,150,90,.7)}
+.como .h2{color:var(--white)}
+.como .h2 em{color:var(--gold-lt)}
+
+/* two audience tabs */
+.como-tabs{display:flex;gap:2px;margin-top:52px;margin-bottom:0}
+.como-tab{
+  font-family:'Instrument Sans',sans-serif;font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  padding:16px 36px;background:rgba(255,255,255,.04);border:none;
+  color:rgba(255,255,255,.35);cursor:none;transition:all .3s;
+}
+.como-tab.active{background:var(--gold);color:var(--ink)}
+.como-tab:not(.active):hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7)}
+
+.steps-panel{display:none;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:2px}
+.steps-panel.active{display:grid}
+.step-block{
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);
+  padding:40px 36px;transition:background .3s;cursor:none;
+}
+.step-block:hover{background:rgba(255,255,255,.06)}
+.step-num{
+  font-family:'Cormorant Garamond',serif;font-size:72px;font-weight:300;
+  color:rgba(184,150,90,.18);line-height:1;margin-bottom:24px;
+}
+.step-block h4{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;color:var(--white);margin-bottom:12px}
+.step-block p{font-size:13px;color:rgba(255,255,255,.38);font-weight:300;line-height:1.7}
+
+/* ─── DIFERENCIAIS ─── */
+.diferenciais{background:var(--paper)}
+.dif-layout{display:grid;grid-template-columns:1fr 1.1fr;gap:100px;align-items:start;margin-top:72px}
+.dif-img{position:relative}
+.dif-img-main{width:100%;height:680px;object-fit:cover;display:block}
+.dif-img-float{
+  position:absolute;top:60px;right:-50px;
+  width:200px;padding:28px;background:var(--ink);
+}
+.dif-img-float-num{font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:300;color:var(--gold);line-height:1}
+.dif-img-float-text{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-top:6px}
+.dif-right{padding-top:20px}
+.dif-right .h2{margin-bottom:20px}
+.dif-right .intro-p{font-size:14px;line-height:1.9;color:var(--slate);font-weight:300;margin-bottom:52px;max-width:460px}
+.dif-items{display:flex;flex-direction:column;gap:0}
+.dif-item{
+  padding:28px 0;border-bottom:1px solid var(--rule);
+  display:grid;grid-template-columns:40px 1fr;gap:24px;align-items:start;
+  transition:padding-left .3s;cursor:none;
+}
+.dif-item:first-child{border-top:1px solid var(--rule)}
+.dif-item:hover{padding-left:8px}
+.dif-icon{
+  width:40px;height:40px;display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--rule);transition:border-color .3s,background .3s;flex-shrink:0;
+}
+.dif-item:hover .dif-icon{border-color:var(--gold);background:rgba(184,150,90,.07)}
+.dif-icon svg{width:16px;height:16px;stroke:var(--gold);fill:none;stroke-width:1.5}
+.dif-text h4{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;color:var(--ink);margin-bottom:6px}
+.dif-text p{font-size:13px;line-height:1.7;color:var(--smoke);font-weight:300}
+
+/* ─── DEPOIMENTOS ─── */
+.depoimentos{background:var(--linen)}
+.dep-layout{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:64px}
+.dep-card{
+  background:var(--white);padding:48px 40px;
+  position:relative;overflow:hidden;transition:transform .3s;cursor:none;
+}
+.dep-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;
+  height:2px;background:var(--gold);
+  transform:scaleX(0);transform-origin:left;transition:transform .5s;
+}
+.dep-card:hover::before{transform:scaleX(1)}
+.dep-card:hover{transform:translateY(-4px)}
+.dep-q{font-family:'Cormorant Garamond',serif;font-size:88px;color:var(--linen);line-height:.75;margin-bottom:20px}
+.dep-stars{color:var(--gold);font-size:11px;letter-spacing:2px;margin-bottom:18px}
+.dep-text{font-family:'Cormorant Garamond',serif;font-size:18px;line-height:1.75;color:var(--slate);font-style:italic;font-weight:300}
+.dep-sep{width:32px;height:1px;background:var(--gold);margin:28px 0}
+.dep-name{font-size:13px;font-weight:500;color:var(--ink)}
+.dep-role{font-size:10px;letter-spacing:.1em;color:var(--smoke);margin-top:3px;text-transform:uppercase}
+.dep-cta{
+  grid-column:1/-1;background:var(--ink);
+  display:flex;justify-content:space-between;align-items:center;padding:52px 56px;
+}
+.dep-cta-text{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:rgba(255,255,255,.6);line-height:1.3}
+.dep-cta-text em{color:var(--gold-lt);font-style:italic}
+
+/* ─── PROPRIETÁRIOS ─── */
+.owners{background:var(--white)}
+.owners-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;margin-top:72px}
+.owners-img-col{position:relative}
+.owners-img-main{width:100%;height:520px;object-fit:cover;display:block;filter:saturate(.85);transition:filter .6s}
+.owners-img-col:hover .owners-img-main{filter:saturate(1)}
+.owners-float{
+  position:absolute;bottom:-2px;right:-2px;
+  background:var(--gold);padding:28px 32px;width:220px;
+}
+.owners-float-num{font-family:'Cormorant Garamond',serif;font-size:44px;font-weight:300;color:var(--ink);line-height:1}
+.owners-float-lbl{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:rgba(20,20,18,.65);margin-top:5px}
+.owners-text .h2{margin-bottom:24px}
+.owners-text p{font-size:14px;line-height:1.9;color:var(--slate);font-weight:300;margin-bottom:14px;max-width:480px}
+.owners-list{list-style:none;margin:32px 0 40px;display:flex;flex-direction:column;gap:14px}
+.owners-list li{display:flex;gap:14px;align-items:flex-start;font-size:13px;color:var(--slate);font-weight:300;line-height:1.6}
+.owners-list li::before{content:'✦';color:var(--gold);font-size:9px;margin-top:3px;flex-shrink:0}
+.btn-owner{
+  font-family:'Instrument Sans',sans-serif;
+  font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink);background:var(--gold);border:none;
+  padding:16px 44px;cursor:none;transition:all .3s;display:inline-block;
+}
+.btn-owner:hover{background:var(--ink);color:var(--white);transform:translateY(-2px)}
+
+/* ─── PARCEIROS ─── */
+.parceiros{background:var(--ink);padding:72px;display:flex;flex-direction:column;align-items:center}
+.parceiros .label{justify-content:center}
+.parceiros-row{display:flex;gap:64px;flex-wrap:wrap;justify-content:center;align-items:center;margin-top:48px}
+.parceiro{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;color:rgba(255,255,255,.18);letter-spacing:.06em;transition:color .3s;cursor:none}
+.parceiro:hover{color:rgba(255,255,255,.5)}
+
+/* ─── FORMULÁRIO ─── */
+.form-section{background:var(--paper)}
+.form-inner{display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:start;margin-top:72px}
+.form-left p{font-size:14px;line-height:1.9;color:var(--slate);font-weight:300;margin-bottom:36px;max-width:400px}
+.form-left .h2{margin-bottom:20px}
+.form-select-btns{display:flex;gap:2px;margin-bottom:36px}
+.fsb{
+  flex:1;padding:16px 20px;border:1px solid var(--rule);
+  font-family:'Instrument Sans',sans-serif;font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  background:transparent;color:var(--smoke);cursor:none;transition:all .3s;
+}
+.fsb.active{background:var(--ink);color:var(--white);border-color:var(--ink)}
+.fsb:not(.active):hover{border-color:var(--gold);color:var(--gold)}
+.form-box{background:var(--white);padding:52px 48px}
+.form-box h3{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--ink);margin-bottom:32px}
+.f-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.f-group{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+.f-group label{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--smoke)}
+.f-group input,.f-group select,.f-group textarea{
+  border:none;border-bottom:1px solid var(--rule);padding:11px 0;
+  background:transparent;font-family:'Instrument Sans',sans-serif;
+  font-size:13px;font-weight:300;color:var(--ink);outline:none;transition:border-color .25s;
+}
+.f-group input:focus,.f-group select:focus,.f-group textarea:focus{border-bottom-color:var(--gold)}
+.f-group textarea{resize:vertical;min-height:80px}
+.btn-submit{
+  width:100%;padding:16px;
+  font-family:'Instrument Sans',sans-serif;font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  background:var(--ink);color:var(--white);border:none;cursor:none;transition:background .3s;
+}
+.btn-submit:hover{background:var(--gold);color:var(--ink)}
+.form-note{font-size:11px;color:var(--smoke);text-align:center;margin-top:14px}
+
+/* ─── FOOTER ─── */
+footer{background:var(--ink);border-top:1px solid rgba(255,255,255,.05);padding:88px 72px 44px}
+.footer-top{display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr;gap:72px;padding-bottom:64px;border-bottom:1px solid rgba(255,255,255,.06)}
+.footer-brand .logo{color:var(--white);margin-bottom:20px;font-size:24px}
+.footer-brand p{font-size:13px;color:rgba(255,255,255,.3);font-weight:300;line-height:1.8;max-width:280px}
+.f-col h5{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:24px}
+.f-col ul{list-style:none}
+.f-col li{margin-bottom:12px}
+.f-col a{font-size:13px;color:rgba(255,255,255,.35);text-decoration:none;font-weight:300;transition:color .2s;cursor:none}
+.f-col a:hover{color:var(--white)}
+.footer-bottom{padding-top:32px;display:flex;justify-content:space-between;align-items:center}
+.footer-bottom p{font-size:11px;color:rgba(255,255,255,.18)}
+.socials{display:flex;gap:24px}
+.socials a{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.25);text-decoration:none;transition:color .2s;cursor:none}
+.socials a:hover{color:var(--gold)}
+
+/* ─── MODALS ─── */
+.modal-bg{
+  display:none;position:fixed;inset:0;z-index:9990;
+  background:rgba(20,20,18,.9);backdrop-filter:blur(10px);
+  align-items:center;justify-content:center;
+}
+.modal-bg.open{display:flex}
+.modal-box{
+  background:var(--paper);padding:60px;max-width:560px;width:90%;
+  position:relative;animation:modalPop .4s cubic-bezier(.34,1.56,.64,1);
+  max-height:90vh;overflow-y:auto;
+}
+.modal-x{position:absolute;top:22px;right:22px;background:none;border:none;cursor:none;font-size:18px;color:var(--smoke);transition:color .2s}
+.modal-x:hover{color:var(--ink)}
+.modal-box h2{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:300;color:var(--ink);margin-bottom:6px}
+.modal-box>p{font-size:13px;color:var(--smoke);margin-bottom:36px}
+.modal-summary{
+  background:var(--linen);padding:18px 20px;margin:20px 0;
+  font-size:12px;color:var(--slate);line-height:1.8;
+}
+.modal-summary strong{font-weight:500;color:var(--ink)}
+
+/* ─── DETAIL MODAL ─── */
+.detail-modal-box{
+  background:var(--paper);max-width:820px;width:90%;
+  position:relative;animation:modalPop .4s cubic-bezier(.34,1.56,.64,1);
+  max-height:90vh;overflow-y:auto;
+}
+.detail-modal-img{height:340px;object-fit:cover;width:100%;display:block;filter:saturate(.85)}
+.detail-modal-body{padding:52px 56px}
+.detail-modal-body .listing-cat{margin-bottom:12px}
+.detail-modal-body h2{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:300;margin-bottom:6px}
+.detail-modal-body .listing-loc{margin-bottom:28px;font-size:13px}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-bottom:36px}
+.detail-col h4{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.detail-col h4::before{content:'';width:20px;height:1px;background:var(--gold)}
+.detail-feat-list{list-style:none;display:flex;flex-direction:column;gap:10px}
+.detail-feat-list li{font-size:13px;font-weight:300;color:var(--slate);display:flex;align-items:center;gap:10px}
+.detail-feat-list li::before{content:'✦';color:var(--gold);font-size:8px;flex-shrink:0}
+.detail-price-bar{
+  background:var(--ink);padding:28px 32px;display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:28px;
+}
+.detail-price-bar .price-amount{font-size:56px;color:var(--white)}
+.detail-price-bar .price-period{color:rgba(255,255,255,.4);font-size:11px;margin-top:4px}
+.detail-actions{display:flex;gap:12px}
+.btn-detail-cta{
+  flex:1;padding:16px;font-family:'Instrument Sans',sans-serif;
+  font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  background:var(--gold);color:var(--ink);border:none;cursor:none;transition:all .3s;
+}
+.btn-detail-cta:hover{background:var(--ink);color:var(--white)}
+.btn-detail-back{
+  padding:16px 28px;font-family:'Instrument Sans',sans-serif;
+  font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  background:transparent;color:var(--slate);border:1px solid var(--rule);cursor:none;transition:all .3s;
+}
+.btn-detail-back:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ─── TOAST ─── */
+.toast{
+  position:fixed;bottom:44px;right:44px;z-index:9999;
+  background:var(--ink);padding:20px 32px;
+  transform:translateY(16px);opacity:0;
+  transition:all .4s cubic-bezier(.34,1.2,.64,1);pointer-events:none;
+}
+.toast.show{transform:translateY(0);opacity:1}
+.toast b{display:block;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:5px;font-weight:400}
+.toast span{font-size:13px;color:rgba(255,255,255,.7);font-weight:300}
+
+/* ─── ANIMATIONS ─── */
+@keyframes slideUp{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{to{opacity:1}}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes pulse-line{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+@keyframes modalPop{from{opacity:0;transform:scale(.92) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.reveal{opacity:0;transform:translateY(36px);transition:opacity .75s ease,transform .75s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-left{opacity:0;transform:translateX(-40px);transition:opacity .75s ease,transform .75s ease}
+.reveal-left.visible{opacity:1;transform:translateX(0)}
+.reveal-right{opacity:0;transform:translateX(40px);transition:opacity .75s ease,transform .75s ease}
+.reveal-right.visible{opacity:1;transform:translateX(0)}
+
+@media(max-width:960px){
+  nav,section,footer{padding-left:24px;padding-right:24px}
+  nav{padding:22px 24px}nav.scrolled{padding:16px 24px}
+  .hero{grid-template-columns:1fr;padding:0 24px 72px}
+  .hero-right,.hero-scroll-indicator{display:none}
+  .hero-actions{grid-template-columns:1fr}
+  .proposta-grid,.dif-layout,.owners-grid,.form-inner,.footer-top{grid-template-columns:1fr;gap:48px}
+  .dep-layout,.mkt-body{grid-template-columns:1fr}
+  .mkt-sidebar{position:static}
+  .listing-card{grid-template-columns:1fr}
+  .listing-card-price{border-left:none;border-top:1px solid var(--rule);flex-direction:row;align-items:center;min-width:auto}
+  .steps-panel.active{grid-template-columns:1fr 1fr}
+  .proposta-img-accent{display:none}
+  .nav-links{display:none}
+  .parceiros{padding:48px 24px}.parceiros-row{gap:32px}
+  body{cursor:auto}.cursor,.cursor-ring{display:none}
+  .detail-grid{grid-template-columns:1fr}
+  .detail-modal-body{padding:32px 24px}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cring"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="logo">
+    SlotMedical
+    <span>Marketplace de Consultórios</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#marketplace">Buscar Consultórios</a></li>
+    <li><a href="#como">Como Funciona</a></li>
+    <li><a href="#proprietarios">Para Proprietários</a></li>
+    <li><a href="#contato">Contato</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="nav-btn-outline" onclick="openAdvertiseModal()">Anunciar Espaço</button>
+    <button class="nav-btn" onclick="document.getElementById('marketplace').scrollIntoView({behavior:'smooth'})">Buscar Consultório</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-visual"></div>
+  <div class="hero-grid-overlay"></div>
+  <div class="hero-left">
+    <div class="hero-eyebrow">SlotMedical — São Paulo, SP</div>
+    <h1>
+      <strong>O consultório</strong>
+      <em>que você sempre</em>
+      <strong>imaginou.</strong>
+    </h1>
+    <p class="hero-sub">Marketplace de consultórios médicos em São Paulo. Contratos de cessão de uso com preço fixo mensal, infraestrutura completa e sem burocracia — para médicos em início de carreira.</p>
+    <div class="hero-actions">
+      <div class="cta-block cta-block-gold" onclick="document.getElementById('marketplace').scrollIntoView({behavior:'smooth'})">
+        <div class="cta-block-eyebrow">Sou Médico</div>
+        <div class="cta-block-title">Quero alugar um consultório</div>
+        <div class="cta-block-action">Buscar espaços <span class="cta-arrow">→</span></div>
+      </div>
+      <div class="cta-block cta-block-outline" onclick="openAdvertiseModal()">
+        <div class="cta-block-eyebrow">Sou Proprietário</div>
+        <div class="cta-block-title">Quero anunciar meu espaço</div>
+        <div class="cta-block-action">Cadastrar agora <span class="cta-arrow">→</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-stat-stack">
+      <div class="h-stat"><div class="h-stat-num">340+</div><div class="h-stat-label">Consultórios</div></div>
+      <div class="h-stat"><div class="h-stat-num">1.200</div><div class="h-stat-label">Médicos Cadastrados</div></div>
+      <div class="h-stat"><div class="h-stat-num">28</div><div class="h-stat-label">Bairros em SP</div></div>
+    </div>
+  </div>
+  <div class="hero-scroll-indicator">Scroll <span class="scroll-line"></span></div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-band">
+  <div class="ticker-inner">
+    <span class="t-item"><b>✦</b>Consultórios Privativos</span>
+    <span class="t-item"><b>✦</b>Contrato de Cessão de Uso</span>
+    <span class="t-item"><b>✦</b>Recepção Inclusa</span>
+    <span class="t-item"><b>✦</b>Preço Fixo Mensal</span>
+    <span class="t-item"><b>✦</b>Assinatura Digital</span>
+    <span class="t-item"><b>✦</b>Sem Fiador</span>
+    <span class="t-item"><b>✦</b>Infraestrutura Pronta</span>
+    <span class="t-item"><b>✦</b>28 Bairros em SP</span>
+    <span class="t-item"><b>✦</b>Consultórios Privativos</span>
+    <span class="t-item"><b>✦</b>Contrato de Cessão de Uso</span>
+    <span class="t-item"><b>✦</b>Recepção Inclusa</span>
+    <span class="t-item"><b>✦</b>Preço Fixo Mensal</span>
+    <span class="t-item"><b>✦</b>Assinatura Digital</span>
+    <span class="t-item"><b>✦</b>Sem Fiador</span>
+    <span class="t-item"><b>✦</b>Infraestrutura Pronta</span>
+    <span class="t-item"><b>✦</b>28 Bairros em SP</span>
+  </div>
+</div>
+
+<!-- PROPOSTA -->
+<section class="proposta" id="sobre">
+  <p class="label reveal">Nossa Proposta</p>
+  <div class="proposta-grid">
+    <div class="proposta-img-wrap reveal-left">
+      <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=900&q=85" alt="Consultório SlotMedical" class="proposta-img-main" loading="lazy"/>
+      <img src="https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=500&q=80" alt="Detalhe" class="proposta-img-accent" loading="lazy"/>
+      <div class="proposta-caption">Consultórios disponíveis — São Paulo, SP</div>
+    </div>
+    <div class="proposta-text reveal-right" style="transition-delay:.15s">
+      <p class="label" style="margin-bottom:16px">Conceito</p>
+      <h2 class="h2">Medicina exercida<br/>com <em>liberdade</em><br/>e sem burocracia.</h2>
+      <p>O SlotMedical nasce da compreensão de que médicos em início de carreira precisam de espaço, não de dívidas. Conectamos médicos a consultórios prontos, com infraestrutura completa e contratos transparentes.</p>
+      <p>Cada consultório listado na plataforma é verificado pela nossa equipe — do mobiliário clínico à conformidade com o CFM. Você chega, abre a porta e começa a atender.</p>
+      <ul class="proposta-list">
+        <li>Contrato de cessão de uso com preço fixo — sem surpresas</li>
+        <li>Endereço profissional em bairros premium de São Paulo</li>
+        <li>Infraestrutura clínica já montada e verificada</li>
+        <li>Assinatura digital — contrato ativo em menos de 24 horas</li>
+        <li>Sem fiador, sem caução, sem taxa de adesão</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- MARKETPLACE -->
+<section class="marketplace" id="marketplace">
+  <div class="mkt-header">
+    <div class="mkt-header-left">
+      <p class="label reveal">Consultórios Disponíveis</p>
+      <h2 class="h2 reveal">Encontre seu<br/><em>espaço ideal.</em></h2>
+      <p class="reveal" style="transition-delay:.08s">Todos os consultórios listados são espaços médicos completos, adequados a qualquer especialidade.</p>
+    </div>
+  </div>
+
+  <!-- SEARCH BAR -->
+  <div class="search-bar reveal">
+    <div class="sf">
+      <div class="sf-label">Bairro / Região</div>
+      <select id="f-bairro">
+        <option value="">Todo São Paulo</option>
+        <option value="moema">Moema</option>
+        <option value="pinheiros">Pinheiros</option>
+        <option value="jardins">Jardins</option>
+        <option value="vila mariana">Vila Mariana</option>
+        <option value="itaim">Itaim Bibi</option>
+        <option value="perdizes">Perdizes</option>
+        <option value="brooklin">Brooklin</option>
+        <option value="saude">Saúde</option>
+      </select>
+    </div>
+    <div class="sf">
+      <div class="sf-label">Período</div>
+      <select id="f-periodo">
+        <option value="">Qualquer período</option>
+        <option value="manha">Manhã</option>
+        <option value="tarde">Tarde</option>
+        <option value="integral">Integral</option>
+        <option value="alt">Dias alternados</option>
+      </select>
+    </div>
+    <div class="sf">
+      <div class="sf-label">Faixa de Preço</div>
+      <select id="f-preco">
+        <option value="">Qualquer valor</option>
+        <option value="ate2000">Até R$ 2.000/mês</option>
+        <option value="2000a3500">R$ 2.000 – R$ 3.500</option>
+        <option value="acima3500">Acima de R$ 3.500</option>
+      </select>
+    </div>
+    <button class="search-go" onclick="filterListings()">Buscar →</button>
+  </div>
+
+  <!-- TABS -->
+  <div class="mkt-tabs">
+    <button class="mkt-tab active" onclick="setTab(this,'todas')">Todos</button>
+    <button class="mkt-tab" onclick="setTab(this,'manha')">Manhã</button>
+    <button class="mkt-tab" onclick="setTab(this,'tarde')">Tarde</button>
+    <button class="mkt-tab" onclick="setTab(this,'integral')">Integral</button>
+    <button class="mkt-tab" onclick="setTab(this,'alt')">Dias Alternados</button>
+  </div>
+
+  <div class="mkt-body">
+    <!-- SIDEBAR FILTERS -->
+    <div class="mkt-sidebar">
+      <div class="filter-block">
+        <div class="fb-title">Faixa de Preço</div>
+        <div class="price-inputs">
+          <input class="price-inp" type="number" placeholder="R$ Mín" id="pmin" value="800">
+          <input class="price-inp" type="number" placeholder="R$ Máx" id="pmax" value="5000">
+        </div>
+      </div>
+      <div class="filter-block">
+        <div class="fb-title">Tipo de Contrato</div>
+        <div class="filter-check"><div class="filter-check-left"><input type="checkbox" checked> Cessão de Uso Mensal</div><span class="filter-count">212</span></div>
+        <div class="filter-check"><div class="filter-check-left"><input type="checkbox" checked> Meio Período</div><span class="filter-count">95</span></div>
+        <div class="filter-check"><div class="filter-check-left"><input type="checkbox"> Por Hora</div><span class="filter-count">33</span></div>
+      </div>
+      <div class="filter-block">
+        <div class="fb-title">Infraestrutura</div>
+        <div class="filter-check"><div class="filter-check-left"><input type="checkbox" checked> Recepção inclusa</div><span class="filter-count">180</span></div>
+        <div class="filter-check"><div class="filter-check-left"><input type="checkbox" checked> Internet fibra</div><span class="filter-count">310</span></div>
+        <div class="filter-check"><div class="filter-check-left"><input type="checkbox"> Macas e mobiliário</div><span class="filter-count">280</span></div>
+        <div class="filter-check"><div class="filter-check-left"><input type="checkbox"> Ar-condicionado</div><span class="filter-count">290</span></div>
+        <div class="filter-check"><div class="filter-check-left"><input type="checkbox"> Estacionamento</div><span class="filter-count">140</span></div>
+      </div>
+      <div class="filter-block">
+        <div class="fb-title">Bairro</div>
+        <div class="tag-cloud">
+          <span class="ftag active" onclick="toggleTag(this)">Moema</span>
+          <span class="ftag" onclick="toggleTag(this)">Pinheiros</span>
+          <span class="ftag" onclick="toggleTag(this)">Jardins</span>
+          <span class="ftag" onclick="toggleTag(this)">Itaim</span>
+          <span class="ftag" onclick="toggleTag(this)">V. Mariana</span>
+          <span class="ftag" onclick="toggleTag(this)">Perdizes</span>
+          <span class="ftag" onclick="toggleTag(this)">Brooklin</span>
+          <span class="ftag" onclick="toggleTag(this)">Saúde</span>
+        </div>
+      </div>
+      <button class="apply-filters" onclick="showToast('✓ Filtros aplicados','Exibindo resultados filtrados.')">Aplicar Filtros</button>
+    </div>
+
+    <!-- CARDS -->
+    <div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <span style="font-size:12px;color:var(--smoke);font-weight:300;letter-spacing:.05em"><span id="card-count">8</span> consultórios encontrados</span>
+        <select style="font-family:'Instrument Sans',sans-serif;font-size:11px;color:var(--slate);border:1px solid var(--rule);padding:8px 14px;background:var(--white);outline:none;cursor:none">
+          <option>Mais relevantes</option>
+          <option>Menor preço</option>
+          <option>Maior preço</option>
+          <option>Melhor avaliação</option>
+        </select>
+      </div>
+      <div class="cards-grid" id="cards-grid"></div>
+    </div>
+  </div>
+</section>
+
+<!-- COMO FUNCIONA -->
+<section class="como" id="como">
+  <p class="label reveal">Como Funciona</p>
+  <h2 class="h2 reveal">Do cadastro ao<br/><em>primeiro atendimento.</em></h2>
+  <div class="como-tabs">
+    <button class="como-tab active" onclick="switchComoTab(this,'medico')">Para Médicos</button>
+    <button class="como-tab" onclick="switchComoTab(this,'proprietario')">Para Proprietários</button>
+  </div>
+  <div class="steps-panel active" id="steps-medico">
+    <div class="step-block"><div class="step-num">01</div><h4>Busque e filtre</h4><p>Encontre consultórios por bairro, período e infraestrutura disponível na plataforma.</p></div>
+    <div class="step-block"><div class="step-num">02</div><h4>Solicite o contrato</h4><p>Informe seus dados e CRM. A clínica responde em até 24 horas com a proposta de cessão.</p></div>
+    <div class="step-block"><div class="step-num">03</div><h4>Assine digitalmente</h4><p>Contrato de cessão de uso com assinatura eletrônica. Nenhum papel, nenhum cartório.</p></div>
+    <div class="step-block"><div class="step-num">04</div><h4>Comece a atender</h4><p>Infraestrutura pronta. Acesse o consultório no dia seguinte e receba seus primeiros pacientes.</p></div>
+  </div>
+  <div class="steps-panel" id="steps-proprietario">
+    <div class="step-block"><div class="step-num">01</div><h4>Cadastre seu espaço</h4><p>Anúncio gratuito. Preencha as informações do consultório, fotos e o valor mensal desejado.</p></div>
+    <div class="step-block"><div class="step-num">02</div><h4>Receba propostas</h4><p>Médicos interessados entram em contato pela plataforma. Você escolhe com quem fechar.</p></div>
+    <div class="step-block"><div class="step-num">03</div><h4>Valide e assine</h4><p>Confirme o CRM do médico e assine o contrato de cessão digitalmente em minutos.</p></div>
+    <div class="step-block"><div class="step-num">04</div><h4>Receba todo mês</h4><p>Pagamento automático e garantido. Gerencie renovações direto no painel da plataforma.</p></div>
+  </div>
+</section>
+
+<!-- DIFERENCIAIS -->
+<section class="diferenciais" id="diferenciais">
+  <div class="dif-layout">
+    <div class="dif-img reveal-left">
+      <img src="https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=800&q=85" alt="Consultório SlotMedical" class="dif-img-main" loading="lazy"/>
+      <div class="dif-img-float">
+        <div class="dif-img-float-num">98%</div>
+        <div class="dif-img-float-text">Satisfação dos médicos locatários</div>
+      </div>
+    </div>
+    <div class="dif-right reveal-right" style="transition-delay:.15s">
+      <p class="label">Por que o SlotMedical</p>
+      <h2 class="h2">Mais que um espaço.<br/><em>Uma plataforma</em><br/>de carreiras.</h2>
+      <p class="intro-p">Pensamos em cada detalhe para que você foque no que realmente importa: seus pacientes e o início da sua trajetória clínica.</p>
+      <div class="dif-items">
+        <div class="dif-item">
+          <div class="dif-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+          <div class="dif-text"><h4>Espaços Verificados</h4><p>Todos os consultórios são inspecionados pela equipe SlotMedical antes de serem publicados na plataforma.</p></div>
+        </div>
+        <div class="dif-item">
+          <div class="dif-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <div class="dif-text"><h4>Conformidade CFM</h4><p>Estrutura contratual homologada. Contratos de cessão de uso em conformidade com as normas do Conselho Regional.</p></div>
+        </div>
+        <div class="dif-item">
+          <div class="dif-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
+          <div class="dif-text"><h4>Preço Fixo Garantido</h4><p>Contratos com valor fixo mensal. Sem reajustes surpresa no primeiro ano. Orçamento previsível para planejar sua carreira.</p></div>
+        </div>
+        <div class="dif-item">
+          <div class="dif-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg></div>
+          <div class="dif-text"><h4>Assinatura Digital</h4><p>Contrato ativo em menos de 24 horas. Sem cartório, sem papelada, sem fiador — assine do celular.</p></div>
+        </div>
+        <div class="dif-item">
+          <div class="dif-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <div class="dif-text"><h4>Comunidade Médica</h4><p>Médicos do mesmo prédio ou clínica, de diversas especialidades. Networking genuíno e referências naturais.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEPOIMENTOS -->
+<section class="depoimentos" id="depoimentos">
+  <p class="label reveal">Médicos falam</p>
+  <h2 class="h2 reveal">O que dizem os<br/><em>médicos do SlotMedical.</em></h2>
+  <div class="dep-layout">
+    <div class="dep-card reveal">
+      <div class="dep-q">"</div>
+      <div class="dep-stars">★★★★★</div>
+      <p class="dep-text">Reduzi meus custos fixos em 60% e ainda ganhei um endereço muito mais nobre. O SlotMedical transformou minha prática clínica já no primeiro mês.</p>
+      <div class="dep-sep"></div>
+      <div class="dep-name">Dr. Gustavo Almeida</div>
+      <div class="dep-role">Clínico Geral · CRM-SP 192341</div>
+    </div>
+    <div class="dep-card reveal" style="transition-delay:.1s">
+      <div class="dep-q">"</div>
+      <div class="dep-stars">★★★★★</div>
+      <p class="dep-text">A estrutura é impecável. Meus pacientes chegam e ficam impressionados. O processo foi todo digital — assinei o contrato em 20 minutos.</p>
+      <div class="dep-sep"></div>
+      <div class="dep-name">Dra. Beatriz Menezes</div>
+      <div class="dep-role">Dermatologista · CRM-SP 204532</div>
+    </div>
+    <div class="dep-card reveal" style="transition-delay:.2s">
+      <div class="dep-q">"</div>
+      <div class="dep-stars">★★★★★</div>
+      <p class="dep-text">O preço fixo foi o que me convenceu. Sei exatamente quanto vou pagar cada mês. Sem surpresas, sem reajustes — posso planejar minha carreira.</p>
+      <div class="dep-sep"></div>
+      <div class="dep-name">Dr. Marcos Vinicius</div>
+      <div class="dep-role">Psiquiatra · CRM-SP 187209</div>
+    </div>
+    <div class="dep-cta reveal">
+      <div class="dep-cta-text">Mais de <em>1.200 médicos</em><br/>já escolheram o SlotMedical.</div>
+      <button class="btn-gold" onclick="document.getElementById('marketplace').scrollIntoView({behavior:'smooth'})">Buscar consultório →</button>
+    </div>
+  </div>
+</section>
+
+<!-- PROPRIETÁRIOS -->
+<section class="owners" id="proprietarios">
+  <div class="owners-grid">
+    <div class="owners-img-col reveal-left">
+      <img src="https://images.unsplash.com/photo-1560472355-536de3962603?w=800&q=85" alt="Proprietário SlotMedical" class="owners-img-main" loading="lazy"/>
+      <div class="owners-float">
+        <div class="owners-float-num">12</div>
+        <div class="owners-float-lbl">dias até a 1ª locação</div>
+      </div>
+    </div>
+    <div class="owners-text reveal-right" style="transition-delay:.15s">
+      <p class="label">Para Proprietários</p>
+      <h2 class="h2">Monetize seu<br/>consultório com<br/><em>médicos qualificados.</em></h2>
+      <p>Anuncie seu espaço gratuitamente e conecte-se com médicos em início de carreira que buscam consultórios prontos em São Paulo.</p>
+      <p>Cuidamos de todo o processo: verificação do CRM, contrato padronizado, assinatura digital e cobrança automática — você foca no que importa.</p>
+      <ul class="owners-list">
+        <li>Anúncio gratuito na plataforma</li>
+        <li>Contratos de cessão de uso padronizados e seguros</li>
+        <li>Verificação de CRM de todos os locatários</li>
+        <li>Assinatura digital inclusa — sem papelada</li>
+        <li>Cobrança e pagamento automáticos todo mês</li>
+        <li>Painel de gestão com histórico de contratos</li>
+      </ul>
+      <button class="btn-owner" onclick="openAdvertiseModal()">Anunciar meu espaço →</button>
+    </div>
+  </div>
+</section>
+
+<!-- PARCEIROS -->
+<div class="parceiros">
+  <p class="label">Convênios &amp; Parceiros</p>
+  <div class="parceiros-row">
+    <span class="parceiro">Unimed</span>
+    <span class="parceiro">Bradesco Saúde</span>
+    <span class="parceiro">Amil</span>
+    <span class="parceiro">SulAmérica</span>
+    <span class="parceiro">Porto Seguro</span>
+    <span class="parceiro">iClinic</span>
+    <span class="parceiro">CFM</span>
+  </div>
+</div>
+
+<!-- FORMULÁRIO -->
+<section class="form-section" id="contato">
+  <p class="label reveal">Fale Conosco</p>
+  <div class="form-inner">
+    <div class="form-left reveal-left">
+      <h2 class="h2">Vamos começar<br/><em>sua jornada.</em></h2>
+      <p>Seja médico em busca do consultório ideal ou proprietário querendo rentabilizar seu espaço — nossa equipe responde em até 2 horas em dias úteis.</p>
+      <div class="form-select-btns">
+        <button class="fsb active" id="form-medico-btn" onclick="switchFormMode('medico')">Sou Médico</button>
+        <button class="fsb" id="form-prop-btn" onclick="switchFormMode('proprietario')">Sou Proprietário</button>
+      </div>
+    </div>
+    <div class="form-box reveal-right" style="transition-delay:.15s">
+      <h3 id="form-title">Encontrar Consultório</h3>
+      <div class="f-row">
+        <div class="f-group"><label>Nome</label><input type="text" id="f-nome" placeholder="Dr(a). Nome Completo"/></div>
+        <div class="f-group"><label>CRM</label><input type="text" id="f-crm" placeholder="CRM-SP 000000"/></div>
+      </div>
+      <div class="f-row">
+        <div class="f-group"><label>Telefone / WhatsApp</label><input type="tel" id="f-tel" placeholder="(11) 00000-0000"/></div>
+        <div class="f-group"><label>E-mail</label><input type="email" id="f-email" placeholder="dr@email.com"/></div>
+      </div>
+      <div class="f-row" id="form-medico-fields">
+        <div class="f-group"><label>Bairro preferido</label>
+          <select><option value="">Selecione</option><option>Moema</option><option>Pinheiros</option><option>Jardins</option><option>Vila Mariana</option><option>Itaim Bibi</option><option>Outro</option></select>
+        </div>
+        <div class="f-group"><label>Data de início</label><input type="date"/></div>
+      </div>
+      <div class="f-group"><label>Mensagem</label><textarea id="f-msg" placeholder="Conte como pretende usar o espaço, sua especialidade, volume de pacientes..."></textarea></div>
+      <button class="btn-submit" onclick="submitMainForm()">Enviar Solicitação</button>
+      <p class="form-note">Respondemos em até 2 horas em dias úteis.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <a href="#" class="logo" style="color:var(--white);margin-bottom:20px;display:flex">
+        SlotMedical
+        <span>Marketplace de Consultórios</span>
+      </a>
+      <p>Espaços médicos em São Paulo para profissionais que constroem suas carreiras com qualidade e sem burocracia.</p>
+    </div>
+    <div class="f-col">
+      <h5>Para Médicos</h5>
+      <ul>
+        <li><a href="#">Como funciona</a></li>
+        <li><a href="#">Buscar consultórios</a></li>
+        <li><a href="#">Preços e contratos</a></li>
+        <li><a href="#">Perguntas frequentes</a></li>
+        <li><a href="#">Suporte</a></li>
+      </ul>
+    </div>
+    <div class="f-col">
+      <h5>Para Proprietários</h5>
+      <ul>
+        <li><a href="#">Anunciar espaço</a></li>
+        <li><a href="#">Gestão de contratos</a></li>
+        <li><a href="#">Painel do proprietário</a></li>
+        <li><a href="#">Relatórios</a></li>
+        <li><a href="#">Suporte</a></li>
+      </ul>
+    </div>
+    <div class="f-col">
+      <h5>SlotMedical</h5>
+      <ul>
+        <li><a href="#">Sobre nós</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Termos de uso</a></li>
+        <li><a href="#">Política de privacidade</a></li>
+        <li><a href="#">Trabalhe conosco</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 SlotMedical Tecnologia Ltda. — São Paulo, SP</p>
+    <div class="socials">
+      <a href="#">Instagram</a>
+      <a href="#">LinkedIn</a>
+      <a href="#">WhatsApp</a>
+    </div>
+  </div>
+</footer>
+
+<!-- DETAIL MODAL -->
+<div class="modal-bg" id="detail-modal" onclick="handleOverlay(event,'detail-modal')">
+  <div class="detail-modal-box">
+    <button class="modal-x" onclick="closeModal('detail-modal')">✕</button>
+    <img id="dm-img" src="" alt="" class="detail-modal-img"/>
+    <div class="detail-modal-body">
+      <div class="listing-cat">Consultório Médico</div>
+      <h2 id="dm-title"></h2>
+      <div class="listing-loc" id="dm-loc"></div>
+      <div class="detail-grid">
+        <div class="detail-col">
+          <h4>Infraestrutura inclusa</h4>
+          <ul class="detail-feat-list" id="dm-feats"></ul>
+        </div>
+        <div class="detail-col">
+          <h4>Condições do contrato</h4>
+          <ul class="detail-feat-list" id="dm-contract"></ul>
+        </div>
+      </div>
+      <div class="detail-price-bar">
+        <div>
+          <div class="price-amount" id="dm-price"></div>
+          <div class="price-period">por mês — contrato de cessão de uso com preço fixo</div>
+        </div>
+        <div style="text-align:right">
+          <div class="listing-rating"><b id="dm-rating"></b></div>
+          <div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-top:6px">Avaliação dos locatários</div>
+        </div>
+      </div>
+      <div class="detail-actions">
+        <button class="btn-detail-back" onclick="closeModal('detail-modal')">← Voltar</button>
+        <button class="btn-detail-cta" onclick="openContractModal()">Solicitar Contrato de Cessão →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTRACT MODAL -->
+<div class="modal-bg" id="contract-modal" onclick="handleOverlay(event,'contract-modal')">
+  <div class="modal-box">
+    <button class="modal-x" onclick="closeModal('contract-modal')">✕</button>
+    <h2>Solicitar<br/><em style="font-style:italic;color:var(--moss)">Contrato de Cessão</em></h2>
+    <p>Preencha seus dados e a clínica entrará em contato em até 24 horas.</p>
+    <div class="modal-summary" id="contract-summary">—</div>
+    <div class="f-row">
+      <div class="f-group"><label>Nome</label><input type="text" placeholder="Dr(a). Nome Completo"/></div>
+      <div class="f-group"><label>CRM</label><input type="text" placeholder="CRM-SP 000000"/></div>
+    </div>
+    <div class="f-row">
+      <div class="f-group"><label>WhatsApp</label><input type="tel" placeholder="(11) 00000-0000"/></div>
+      <div class="f-group"><label>Início desejado</label><input type="date"/></div>
+    </div>
+    <div class="f-group"><label>Especialidade</label>
+      <select><option value="">Selecione</option><option>Clínica Geral</option><option>Cardiologia</option><option>Dermatologia</option><option>Ginecologia</option><option>Ortopedia</option><option>Psiquiatria</option><option>Neurologia</option><option>Pediatria</option><option>Outra</option></select>
+    </div>
+    <button class="btn-submit" onclick="submitForm('contract')">Enviar Solicitação</button>
+    <p class="form-note">Seus dados estão seguros conosco.</p>
+  </div>
+</div>
+
+<!-- ADVERTISE MODAL -->
+<div class="modal-bg" id="advertise-modal" onclick="handleOverlay(event,'advertise-modal')">
+  <div class="modal-box">
+    <button class="modal-x" onclick="closeModal('advertise-modal')">✕</button>
+    <h2>Anunciar<br/><em style="font-style:italic;color:var(--moss)">meu espaço</em></h2>
+    <p>Cadastre seu consultório e comece a receber propostas de médicos qualificados.</p>
+    <div class="modal-summary" style="background:rgba(184,150,90,.1);color:var(--gold)">
+      <strong>✦ Anúncio gratuito</strong> — Comissão apenas sobre a primeira mensalidade após a locação ser concretizada.
+    </div>
+    <div class="f-row">
+      <div class="f-group"><label>Nome do responsável</label><input type="text" placeholder="Nome completo"/></div>
+      <div class="f-group"><label>WhatsApp</label><input type="tel" placeholder="(11) 00000-0000"/></div>
+    </div>
+    <div class="f-row">
+      <div class="f-group"><label>Nome da clínica</label><input type="text" placeholder="Clínica / Consultório"/></div>
+      <div class="f-group"><label>Bairro</label>
+        <select><option>Moema</option><option>Pinheiros</option><option>Jardins</option><option>Vila Mariana</option><option>Itaim Bibi</option><option>Perdizes</option><option>Outro</option></select>
+      </div>
+    </div>
+    <div class="f-row">
+      <div class="f-group"><label>Nº de salas disponíveis</label><input type="number" placeholder="1" min="1"/></div>
+      <div class="f-group"><label>Valor mensal (R$)</label><input type="number" placeholder="2.500"/></div>
+    </div>
+    <button class="btn-submit" onclick="submitForm('advertise')">Publicar meu consultório</button>
+    <p class="form-note">Nossa equipe valida e publica em até 48 horas.</p>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <b id="toast-title">✓ Solicitação Recebida</b>
+  <span id="toast-msg">Entraremos em contato em breve. Obrigado!</span>
+</div>
+
+<script>
+/* ─── DATA ─── */
+const listings = [
+  {
+    id:1,
+    img:'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=700&q=80',
+    title:'Consultório Médico Premium — Moema',
+    loc:'Moema, SP — 850m do metrô Ana Rosa',
+    tags:['Integral','Recepção Inclusa','Wi-Fi Fibra'],
+    price:'2.800', priceNum:2800, period:'/mês', rating:'★★★★★  4.9 (78)',
+    badge:'Mais Popular', periodo:'integral', bairro:'moema',
+    features:['Maca de exame regulável','Mobiliário clínico completo','Recepcionista compartilhada','Impressora e scanner','Ar-condicionado split','Internet fibra 500MB'],
+    contract:['Cessão de uso — 12 meses','Preço fixo sem reajuste no 1º ano','Acesso 7h–20h, seg–sáb','Sem fiador exigido','IPTU e condomínio inclusos','Rescisão com 30 dias de aviso']
+  },
+  {
+    id:2,
+    img:'https://images.unsplash.com/photo-1581056771107-24ca5f033842?w=700&q=80',
+    title:'Consultório Médico — Jardins',
+    loc:'Jardins, SP — próx. Av. Paulista',
+    tags:['Manhã','Pia Clínica','Estacionamento'],
+    price:'3.400', priceNum:3400, period:'/mês', rating:'★★★★★  4.8 (45)',
+    badge:'Novo', periodo:'manha', bairro:'jardins',
+    features:['Maca hidráulica','Pia clínica embutida','Sala de espera privativa','Iluminação LED clínica','PABX dedicado','Autoclave compartilhada'],
+    contract:['Cessão de uso — mín. 6 meses','Ajuste IGPM após 12 meses','Acesso exclusivo manhã','Suporte técnico incluso','Seguro de responsabilidade civil','1ª mensalidade proporcional']
+  },
+  {
+    id:3,
+    img:'https://images.unsplash.com/photo-1516549655169-df83a0774514?w=700&q=80',
+    title:'Consultório Médico — Pinheiros',
+    loc:'Pinheiros, SP — rua dos Pinheiros',
+    tags:['Tarde','Iluminação 6500K','Frigobar'],
+    price:'3.100', priceNum:3100, period:'/mês', rating:'★★★★★  5.0 (32)',
+    badge:'Top Avaliado', periodo:'tarde', bairro:'pinheiros',
+    features:['Iluminação clínica 6500K','Maca hidráulica regulável','Frigobar para insumos','Lixeira de perfuro-cortante','Pia clínica','Wi-Fi dedicado'],
+    contract:['Cessão de uso — 12 meses','Período tarde fixo','Seguro de equipamentos','Insumos básicos inclusos','Wi-Fi exclusivo','Sem taxa de adesão']
+  },
+  {
+    id:4,
+    img:'https://images.unsplash.com/photo-1504439468489-c8920d796a29?w=700&q=80',
+    title:'Consultório Médico — Vila Mariana',
+    loc:'Vila Mariana, SP — próx. UNIFESP',
+    tags:['Integral','Banheiro Privativo','Armários'],
+    price:'2.600', priceNum:2600, period:'/mês', rating:'★★★★☆  4.7 (61)',
+    badge:null, periodo:'integral', bairro:'vila mariana',
+    features:['Foco clínico incluso','Autoclave compartilhada','Banheiro privativo','Armário de medicamentos','Maca de exame','Mesa e cadeiras ergonômicas'],
+    contract:['Cessão de uso — 12 meses','Acesso integral','Recepção compartilhada','Sem despesas extras','Laudos via sistema','Renovação automática']
+  },
+  {
+    id:5,
+    img:'https://images.unsplash.com/photo-1517502884422-41eaead166d4?w=700&q=80',
+    title:'Consultório Acústico — Perdizes',
+    loc:'Perdizes, SP — rua Cardoso de Almeida',
+    tags:['Dias Alternados','Isolamento Acústico','Chave Digital'],
+    price:'1.900', priceNum:1900, period:'/mês', rating:'★★★★★  4.9 (54)',
+    badge:'Melhor Custo-Benefício', periodo:'alt', bairro:'perdizes',
+    features:['Isolamento acústico profissional','Sofá e poltronas ergonômicas','Iluminação regulável','Saída independente','Chave digital exclusiva','Wi-Fi privado'],
+    contract:['Cessão — dias alternados','Mínimo 3 meses','Preço fixo garantido','Sala reservada exclusivamente','Sem taxa de setup','Acesso 8h–20h']
+  },
+  {
+    id:6,
+    img:'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=700&q=80',
+    title:'Consultório Médico — Brooklin',
+    loc:'Brooklin, SP — próx. Hospital São Paulo',
+    tags:['Manhã','Negatoscópio','Garagem Inclusa'],
+    price:'2.200', priceNum:2200, period:'/mês', rating:'★★★★☆  4.6 (38)',
+    badge:null, periodo:'manha', bairro:'brooklin',
+    features:['Negatoscópio LED','Maca resistente 200kg','Garagem para 2 veículos','Banheiro adaptado','Recepção inclusa','Pia clínica'],
+    contract:['Cessão de uso — 6 meses','Período matutino','Estacionamento incluso','Seguro de equipamentos','Renovação facilitada','Sem taxa de adesão']
+  },
+  {
+    id:7,
+    img:'https://images.unsplash.com/photo-1560472355-536de3962603?w=700&q=80',
+    title:'Consultório Compact — Saúde',
+    loc:'Saúde, SP — 2 min do metrô Saúde',
+    tags:['Tarde','Econômico','Metrô'],
+    price:'1.400', priceNum:1400, period:'/mês', rating:'★★★★☆  4.5 (29)',
+    badge:'Mais Acessível', periodo:'tarde', bairro:'saude',
+    features:['Maca de exame','Mesa e cadeiras','Ar-condicionado','Wi-Fi compartilhado','Recepção coletiva','Impressora compartilhada'],
+    contract:['Cessão de uso — 6 meses','Período tarde','Sem taxa de adesão','Renovação flexível','Inclui internet e luz','Valor mais acessível do bairro']
+  },
+  {
+    id:8,
+    img:'https://images.unsplash.com/photo-1497366412874-3415097a27e7?w=700&q=80',
+    title:'Consultório Premium — Itaim Bibi',
+    loc:'Itaim Bibi, SP — av. Faria Lima',
+    tags:['Integral','Premium','Recepcionista Exclusiva'],
+    price:'4.200', priceNum:4200, period:'/mês', rating:'★★★★★  4.9 (22)',
+    badge:'Premium', periodo:'integral', bairro:'itaim',
+    features:['Recepcionista exclusiva','Sala de espera VIP','Serviço de café incluso','Acesso 24 horas','Wi-Fi dedicado 1GB','Videoconferência'],
+    contract:['Cessão de uso — 24 meses','Sem reajuste por 2 anos','Acesso 24h com biometria','CNPJ na clínica aceito','Assessoria jurídica inclusa','Seguro abrangente']
+  },
+];
+
+let currentCard = null;
+
+function renderListings(data) {
+  const grid = document.getElementById('cards-grid');
+  document.getElementById('card-count').textContent = data.length;
+  if (!data.length) {
+    grid.innerHTML = `<div class="empty-state">Nenhum consultório encontrado<small>Ajuste os filtros para ver mais resultados</small></div>`;
+    return;
+  }
+  grid.innerHTML = data.map(c => `
+    <div class="listing-card reveal" onclick="openDetail(${c.id})">
+      <div class="listing-card-img-wrap">
+        ${c.badge ? `<div class="listing-badge">${c.badge}</div>` : ''}
+        <img src="${c.img}" alt="${c.title}" class="listing-card-img" loading="lazy"/>
+      </div>
+      <div class="listing-card-body">
+        <div>
+          <div class="listing-cat">Consultório Médico</div>
+          <div class="listing-title">${c.title}</div>
+          <div class="listing-loc">📍 ${c.loc}</div>
+          <div class="listing-tags">${c.tags.map(t=>`<span class="ltag">${t}</span>`).join('')}</div>
+        </div>
+        <div class="listing-feats">
+          ${c.features.slice(0,3).map(f=>`<span>${f}</span>`).join('')}
+        </div>
+      </div>
+      <div class="listing-card-price">
+        <button class="listing-fav" onclick="event.stopPropagation();toggleFav(this)">♡</button>
+        <div>
+          <div class="price-amount">R$<br/>${c.price}</div>
+          <div class="price-period">${c.period}</div>
+          <div class="price-type">Cessão de Uso</div>
+          <div class="listing-rating">${c.rating}</div>
+        </div>
+        <button class="btn-detail" onclick="event.stopPropagation();openDetail(${c.id})">Ver detalhes →</button>
+      </div>
+    </div>
+  `).join('');
+  // re-observe new cards
+  document.querySelectorAll('.listing-card.reveal').forEach(el => io.observe(el));
+}
+
+function openDetail(id) {
+  const c = listings.find(x => x.id === id);
+  if (!c) return;
+  currentCard = c;
+  document.getElementById('dm-img').src = c.img;
+  document.getElementById('dm-title').textContent = c.title;
+  document.getElementById('dm-loc').textContent = '📍 ' + c.loc;
+  document.getElementById('dm-price').textContent = 'R$ ' + c.price;
+  document.getElementById('dm-rating').textContent = c.rating;
+  document.getElementById('dm-feats').innerHTML = c.features.map(f=>`<li>${f}</li>`).join('');
+  document.getElementById('dm-contract').innerHTML = c.contract.map(f=>`<li>${f}</li>`).join('');
+  openModal('detail-modal');
+}
+
+function openContractModal() {
+  closeModal('detail-modal');
+  if (currentCard) {
+    document.getElementById('contract-summary').innerHTML =
+      `<strong>Consultório:</strong> ${currentCard.title}<br><strong>Valor:</strong> R$ ${currentCard.price}${currentCard.period} &nbsp;·&nbsp; <strong>Tipo:</strong> Cessão de Uso`;
+  }
+  openModal('contract-modal');
+}
+
+function openAdvertiseModal() {
+  openModal('advertise-modal');
+}
+
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+function handleOverlay(e, id) {
+  if (e.target === document.getElementById(id)) closeModal(id);
+}
+
+function filterListings() {
+  const bairro = document.getElementById('f-bairro').value.toLowerCase();
+  const periodo = document.getElementById('f-periodo').value;
+  const preco = document.getElementById('f-preco').value;
+  const filtered = listings.filter(c => {
+    const mb = !bairro || c.bairro.includes(bairro);
+    const mp = !periodo || c.periodo === periodo;
+    const mv = !preco ||
+      (preco === 'ate2000' && c.priceNum <= 2000) ||
+      (preco === '2000a3500' && c.priceNum > 2000 && c.priceNum <= 3500) ||
+      (preco === 'acima3500' && c.priceNum > 3500);
+    return mb && mp && mv;
+  });
+  renderListings(filtered);
+  document.getElementById('marketplace').scrollIntoView({behavior:'smooth'});
+}
+
+function setTab(el, tipo) {
+  document.querySelectorAll('.mkt-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderListings(tipo === 'todas' ? listings : listings.filter(c => c.periodo === tipo));
+}
+
+function switchComoTab(el, target) {
+  document.querySelectorAll('.como-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.steps-panel').forEach(s => s.classList.remove('active'));
+  document.getElementById('steps-' + target).classList.add('active');
+}
+
+function switchFormMode(mode) {
+  document.querySelectorAll('.fsb').forEach(b => b.classList.remove('active'));
+  document.getElementById('form-' + mode + '-btn').classList.add('active');
+  document.getElementById('form-title').textContent = mode === 'medico' ? 'Encontrar Consultório' : 'Anunciar meu Espaço';
+  const crm = document.getElementById('f-crm');
+  crm.placeholder = mode === 'medico' ? 'CRM-SP 000000' : 'CNPJ (opcional)';
+}
+
+function toggleTag(el) { el.classList.toggle('active'); }
+
+function toggleFav(btn) {
+  btn.textContent = btn.textContent === '♡' ? '♥' : '♡';
+  if (btn.textContent === '♥') showToast('✦ Favorito adicionado', 'Consultório salvo nos seus favoritos.');
+}
+
+function submitForm(type) {
+  if (type === 'contract') {
+    closeModal('contract-modal');
+    showToast('✓ Solicitação Enviada', 'A clínica entrará em contato em até 24 horas.');
+  } else {
+    closeModal('advertise-modal');
+    showToast('✓ Anúncio Recebido', 'Nossa equipe validará e publicará em até 48 horas.');
+  }
+}
+
+function submitMainForm() {
+  const n = document.getElementById('f-nome').value;
+  if (!n) { alert('Por favor, preencha seu nome.'); return; }
+  showToast('✓ Mensagem Enviada', 'Respondemos em até 2 horas em dias úteis.');
+}
+
+function showToast(title, msg) {
+  document.getElementById('toast-title').textContent = title;
+  document.getElementById('toast-msg').textContent = msg;
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 4500);
+}
+
+/* ─── CURSOR ─── */
+const cur = document.getElementById('cursor');
+const ring = document.getElementById('cring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cur.style.left = mx+'px'; cur.style.top = my+'px';
+});
+(function animRing() {
+  rx += (mx-rx)*.12; ry += (my-ry)*.12;
+  ring.style.left = rx+'px'; ring.style.top = ry+'px';
+  requestAnimationFrame(animRing);
+})();
+document.querySelectorAll('a,button,[class*="card"],[class*="listing"],[class*="cta-block"],[class*="dif-item"],[class*="dep-card"]').forEach(el => {
+  el.addEventListener('mouseenter', () => { cur.style.width='18px';cur.style.height='18px';cur.style.background='transparent';cur.style.border='1.5px solid var(--gold)';ring.style.opacity='0'; });
+  el.addEventListener('mouseleave', () => { cur.style.width='10px';cur.style.height='10px';cur.style.background='var(--gold)';cur.style.border='none';ring.style.opacity='1'; });
+});
+
+/* ─── NAV SCROLL ─── */
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 60));
+
+/* ─── REVEAL ─── */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+}, { threshold: .1 });
+document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el => io.observe(el));
+
+/* ─── INIT ─── */
+renderListings(listings);
+</script>
+</body>
+</html>
